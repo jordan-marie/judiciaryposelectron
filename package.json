@@ -1,6 +1,6 @@
 {
-  "name": "POS electron",
-  "version": "1.0.0",
+  "name": "pos-electron",
+  "version": "1.0.1",
   "description": "lightweight pos new technology",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,6 @@
     "dist": "electron-builder"
   },
   "dependencies": {
-    "electron": "^22.0.0",
     "electron-updater": "^5.3.0",
     "knex": "^2.4.0",
     "sqlite3": "^5.1.4"
@@ -23,8 +22,12 @@
   "build": {
     "appId": "com.jordan.pos",
     "productName": "POS electron",
+    "asar": false,
     "win": {
       "target": "nsis"
+    },
+    "nsis":{
+      "perMachine": true
     },
     "directories": {
       "output": "dist"
@@ -33,6 +36,7 @@
   "author": "JordanMarie",
   "license": "ISC",
   "devDependencies": {
+    "electron": "^22.0.2",
     "electron-builder": "^23.6.0",
     "electron-rebuild": "^3.2.9"
   }

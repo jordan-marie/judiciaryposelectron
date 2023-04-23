@@ -1,0 +1,125 @@
+<div class="pcoded-content settings-forms">
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">Settings Page</h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
+                        <li class="breadcrumb-item"><a href="#!">Settings Page</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ breadcrumb ] end -->
+    <!-- [ Main Content ] start -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>API BASE URL</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <form id="api_form" class="form-inline">
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="api_url" class="sr-only">API Url</label>
+                                <input type="text" class="form-control set-input" id="api_url"  name="api_url" placeholder="http://rcms.govmu.org">
+                            </div>
+                            <button type="submit" id="btn-submit-api" class="btn btn-primary mb-2 btn-submit">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Printer a5</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <form class="form-inline">
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="printer_a5" class="sr-only">Printer</label>
+                                <input type="text" class="form-control set-input" id="print_a5"  name="print_a5" placeholder="printer A5">
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-2 btn-submit">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Cash Till name</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <form class="form-inline">
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="printer_a5" class="sr-only">Printer</label>
+                                <input type="text" class="form-control set-input" id="cashtill_name"  name="cashtill_name" placeholder="RH01">
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-2 btn-submit">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>District court name</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <form class="form-inline">
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="printer_a5" class="sr-only">Printer</label>
+                                <input type="text" class="form-control set-input" id="district_court_name"  name="district_court_name" placeholder="District Court">
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-2 btn-submit">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->
+</div>
+<script>
+    $('.settings-forms form').submit(function(e){
+        e.preventDefault();
+        let obj = $(this);
+        obj.find('.btn-submit').html('<span class="spinner-border spinner-border-sm" role="status"></span> Loading...');
+        let nameInput = obj.find('.set-input').attr('name');
+        let valueInput = obj.find('.set-input').val();
+        
+        let input = {
+            name : nameInput,
+            value : valueInput
+        }
+        ipcRenderer.send('api:save', input);
+
+        setTimeout(function(){
+            obj.find('.btn-submit').html('Save');
+        },1000);
+    });
+
+    $(document).ready(function(e){
+        window.bridge.settings();
+    });
+</script>

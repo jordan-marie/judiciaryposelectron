@@ -1,0 +1,367 @@
+<!-- [ Main Content ] start -->
+<div class="pcoded-content">
+    <!-- [ Main Content ] start -->
+    <div class="row">
+        <!-- [ sample-page ] start -->
+        <div class="col-sm-12">
+            <div class="card">
+
+                <div class="card-header">
+                    <form>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="Text">
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <button type="button" class="btn  btn-info">Auto populate</button>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <button type="button" class="btn  btn-warning"  data-toggle="modal" data-target=".bd-example-modal-lg">Manual Entry</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="card-header-right">
+                        
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="transaction-container">
+                            <!-- block of form transaction -->
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px">
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label class="floating-label" for="Email">Outstanding Amount</label>
+                                <input type="text" class="form-control" id="Text">
+                            </div>
+                        </div>
+                        <div id="transaction-number-items" class="col-sm text-center">
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label class="floating-label" for="Email">Total Payable Amount</label>
+                                <input type="text" class="form-control" id="Text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row payment-mode-container">
+                        <div class="col-sm-2">
+                            
+                        </div>
+                        <div class="col-sm-8 payment-mode-wrapper">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Cash</span>
+                                </div>
+                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" placeholder="Tender">
+                            </div>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Card</span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Card Number">
+                                <select id="inputState" class="form-control">
+                                    <option selected="">MCB</option>
+                                    <option>State bank</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Cheques</span>
+                                </div>
+                                <input type="text" class="form-control"  placeholder="Cheque Number">
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- [ sample-page ] end -->
+    </div>
+    <!-- [ Main Content ] end -->
+</div>
+<!-- [ Main Content ] end -->
+<div id="modal-transaction" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="floating-label" for="date-of-offender">Date of Offence / issue</label>
+                            <input type="date" class="form-control" id="date-of-offender" aria-describedby="DateOfOffenderHelp">
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="floating-label" for="fpn-pedn-no">FPN / PEDN No</label>
+                            <input type="text" class="form-control" id="fpn-pedn-no" placeholder="FPN / PEDN No">
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="floating-label" for="fpn-pedn-payer">Payer</label>
+                            <input type="text" id="fpn-pedn-payer" class="form-control" placeholder="">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active text-uppercase" id="fpn-tab" data-toggle="tab" href="#fpn" role="tab" aria-controls="fpn" aria-selected="true">FPN</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="court-tab" data-toggle="tab" href="#court" role="tab" aria-controls="court" aria-selected="false">Court</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="moenv-tab" data-toggle="tab" href="#moenv" role="tab" aria-controls="moenv" aria-selected="false">MOENV</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="pedn-tab" data-toggle="tab" href="#pedn" role="tab" aria-controls="pedn" aria-selected="false">PEDN</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="nta-tab" data-toggle="tab" href="#nta" role="tab" aria-controls="nta" aria-selected="false">NTA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="other-offences-tab" data-toggle="tab" href="#other-offences" role="tab" aria-controls="other-offences" aria-selected="false">Other Offences</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="e-wallet-tab" data-toggle="tab" href="#e-wallet" role="tab" aria-controls="e-wallet" aria-selected="false">E-wallet</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="fpn" role="tabpanel" aria-labelledby="fpn-tab">
+                        <div class="container">
+                            <form id="fpn-form">
+                                <div class="form-row">
+                                    <div class="form-group col-md-9">
+                                        <label>Offence</label>
+                                        <select id="fpn-select" class="form-control form-control-sm">
+                                            <option></option>
+                                            <option>Large select</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label>Amount</label>
+                                        <input type="number" class="form-control form-control-sm">
+                                    </div>
+                                </div>
+                                <div class="add-items">
+
+                                </div>
+                                <div class="form-group col-md-1 p-0 btn btn-primary">
+                                    <button class="add-btn-item form-control form-control-sm">+</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="court" role="tabpanel" aria-labelledby="court-tab">
+                        <div class="container">
+                            <form id="court-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend input-group-prepend-sm">
+                                                <span class="input-group-text text-wrap width-span-lg">First and last name</span>
+                                            </div>
+                                            <input type="number" class="form-control form-control-sm">
+                                            <input type="number" class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend input-group-prepend-sm">
+                                                <span class="input-group-text text-wrap width-span-lg">First and last name</span>
+                                            </div>
+                                            <input type="number" class="form-control form-control-sm">
+                                            <input type="number" class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="moenv" role="tabpanel" aria-labelledby="moenv-tab">
+                        <div class="container">
+                            <form id="moenv-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend input-group-prepend-sm">
+                                                <span class="input-group-text text-wrap width-span-lg">First and last name</span>
+                                            </div>
+                                            <input type="number" class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend input-group-prepend-sm">
+                                                <span class="input-group-text text-wrap width-span-lg">First and last name</span>
+                                            </div>
+                                            <input type="number" class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pedn" role="tabpanel" aria-labelledby="pedn-tab">
+                        <div class="container">
+                            <form id="pedn-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend input-group-prepend-sm">
+                                                <span class="input-group-text text-wrap width-span-lg">First and last name</span>
+                                            </div>
+                                            <input type="number" class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend input-group-prepend-sm">
+                                                <span class="input-group-text text-wrap width-span-lg">First and last name</span>
+                                            </div>
+                                            <input type="number" class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="nta" role="tabpanel" aria-labelledby="nta-tab">
+                        <div class="container">
+                            <form id="nta-form">
+                                <div class="form-row">
+                                    <div class="form-group col-md-9">
+                                        <label>Offence</label>
+                                        <select id="nta-select" class="form-control form-control-sm">
+                                            <option></option>
+                                            <option>Large select</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label>Amount</label>
+                                        <input type="number" class="form-control form-control-sm">
+                                    </div>
+                                </div>
+                                <div class="add-items">
+
+                                </div>
+                                <div class="form-group col-md-1 p-0 btn btn-primary">
+                                    <button class="add-btn-item form-control form-control-sm">+</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="other-offences" role="tabpanel" aria-labelledby="other-offences-tab">
+                        <div class="container">
+                            <form id="other-offences-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend input-group-prepend-sm">
+                                                <span class="input-group-text text-wrap width-span-lg">First and last name</span>
+                                            </div>
+                                            <input type="number" class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend input-group-prepend-sm">
+                                                <span class="input-group-text text-wrap width-span-lg">First and last name</span>
+                                            </div>
+                                            <input type="number" class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="e-wallet" role="tabpanel" aria-labelledby="e-wallet-tab">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form id="e-wallet-form">
+                                        <div class="form-group row">
+                                            <label for="pract-id" class="col-sm-4 col-form-label">Practitioner ID</label>
+                                            <div class="col-sm-8">
+                                                <input id="pract-id" type="text" class="form-control form-control-sm">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="pract-name" class="col-sm-4 col-form-label">Name</label>
+                                            <div class="col-sm-8">
+                                                <input id="pract-name" type="text" class="form-control form-control-sm">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="outstd-amt" class="col-sm-4 col-form-label">Outstanding Amount</label>
+                                            <div class="col-sm-8">
+                                                <input id="outstd-amt" type="number" class="form-control form-control-sm">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="pract-balance" class="col-sm-4 col-form-label">Balance</label>
+                                            <div class="col-sm-8">
+                                                <input id="pract-balance" type="number" class="form-control form-control-sm">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="repl-amt" class="col-sm-4 col-form-label">Amount to be Replenished</label>
+                                            <div class="col-sm-8">
+                                                <input id="repl-amt" type="number" class="form-control form-control-sm">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-10">
+                                                <button type="submit" class="btn  btn-primary">Search</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn  btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="submit-tab-form" type="button" class="btn  btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        document.getElementById('date-of-offender').value = new Date().toISOString().substring(0, 10);
+
+        $(document).on('click', '.transaction-close',function(){
+            $(this).parents('.transaction-block').remove();
+            transaction_number();
+        });
+
+        $("#fpn-select").select2({theme: 'bootstrap4'});
+
+        $("#nta-select").select2({theme: 'bootstrap4'});
+
+        $("#submit-tab-form").click(function(){
+            $('.tab-content .active form').submit();
+        });
+    });
+</script>

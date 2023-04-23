@@ -1,0 +1,71 @@
+.transaction-container{
+    height: 245px;
+    border: solid 1px #e2e5e8;
+    width: 100%;
+    margin: 0 16px;
+    overflow: hidden;
+    overflow-y:auto;
+}
+
+.payment-mode-wrapper .input-group-text{
+    width: 124px;
+}
+
+.payment-mode-container{
+    margin-top: 10px;
+    background-color: rgb(192, 222, 240);
+    padding: 10px;
+}
+
+.transaction-block{
+    background-color: #d4d6d7;
+    min-height: 50px;
+    margin: 6px;
+    padding: 10px;
+}
+
+.transaction-block input{
+    height: 25px;
+    min-height: 0 !important;
+}
+
+.transaction-block .badge{
+    height: 20px;
+    margin-top: 3px;
+}
+
+.transaction-block .input-group-prepend{
+    height: 25px;
+}
+
+.transaction-block .p-payment{
+    font-size: 9px;
+}
+
+.select2-container.select2-container--bootstrap4.select2-container--open{
+    z-index: 9999;
+}
+
+.bd-example-modal-lg .tab-content{
+    min-height: 300px;
+}
+
+.input-group-prepend-sm{
+    height: 33px;
+}
+
+.width-span-lg{
+    width: 330px;
+}
+
+.tab-content input{
+    text-align: right;
+}
+
+.font-size-11{
+    font-size: 11px;
+}
+
+.margin-left-15{
+    margin-left: 15px;
+}
