@@ -54,6 +54,7 @@ app.on("ready", () => {
 	/*New Update Available*/
 	autoUpdater.on("update-available", (info) => {
 		mainWindow.webContents.send("resultVersion", 'Update Available');
+		autoUpdater.downloadUpdate();
 	});
 
 	autoUpdater.on("update-not-available", (info) => {
