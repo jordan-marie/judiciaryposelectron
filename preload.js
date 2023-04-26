@@ -11,6 +11,11 @@ let displayInfo = () => {
             resultEl.innerHTML += "First Name: " + result[i].name.toString() + " - Last name: " +result[i].surname.toString()+ "<br/>";
         }
     });
+    
+    ipc.on("resultVersion", function(evt, result){
+        let resultEl = document.getElementById("result-version");
+        resultEl.innerHTML = result;
+    });
 }
 
 let getSettings = () => {
