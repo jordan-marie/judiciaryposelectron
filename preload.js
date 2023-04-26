@@ -4,14 +4,14 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 let displayInfo = () => {
     ipc.send("mainWindowLoaded")
-    ipc.on("resultSent", function(evt, result){
+    /*ipc.on("resultSent", function(evt, result){
         let resultEl = document.getElementById("result");
         console.log(result);
         for(var i = 0; i < result.length;i++){
             resultEl.innerHTML += "First Name: " + result[i].name.toString() + " - Last name: " +result[i].surname.toString()+ "<br/>";
         }
-    });
-    
+    });*/
+
     ipc.on("resultVersion", function(evt, result){
         let resultEl = document.getElementById("result-version");
         resultEl.innerHTML = result;
