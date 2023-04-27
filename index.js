@@ -5,8 +5,8 @@ const { autoUpdater, AppUpdater } = require("electron-updater");
 let curWindow;
 
 //Basic flags
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = true;
+//autoUpdater.autoDownload = false;
+//autoUpdater.autoInstallOnAppQuit = true;
 
 var knex = require("knex")({
 	client: "sqlite3",
@@ -51,6 +51,11 @@ app.on("ready", () => {
 		});
 	});
 
+	/*Checking for update*/
+	autoUpdater.on("checking-for-update", (info) => {
+		mainWindow.webContents.send("resultVersion", 'Checking for Updates...');
+	});
+
 	/*New Update Available*/
 	autoUpdater.on("update-available", (info) => {
 		mainWindow.webContents.send("resultVersion", 'Update Available');
@@ -61,9 +66,19 @@ app.on("ready", () => {
 		mainWindow.webContents.send("resultVersion", 'NO Update Available');
 	});
 
+	/*Download in progress */
+	autoUpdater.on("download-progress", (progressObj) => {
+		let logMessage = 'Download speed: ' + progressObj.bytesPerSecond;
+		logMessage += ' - Downloaded ' + progressObj.percent + '%';
+		logMessage += ' (' + progressObj.transferred +'/'+ progressObj.total + ')';
+
+		mainWindow.webContents.send("resultVersion", logMessage);
+	});
+
 	/*Download Completion Message*/
 	autoUpdater.on("update-downloaded", (info) => {
-		mainWindow.webContents.send("resultVersion", 'Downloading updates...');
+		mainWindow.webContents.send("resultVersion", 'Updates Downloaded');
+		autoUpdater.quitAndInstall();
 	});
 
 	autoUpdater.on("error", (info) => {
