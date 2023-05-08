@@ -81,8 +81,8 @@ app.on("ready", () => {
 	});
 
 	autoUpdater.on("error", (info) => {
-		console.log(info);
-		mainWindow.webContents.send("resultVersion", 'Something Goes wrong');
+		//console.log(info);
+		mainWindow.webContents.send("resultVersion", info);
 	});
 
 	//save api data

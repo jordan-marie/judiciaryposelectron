@@ -13,6 +13,7 @@ let displayInfo = () => {
     });*/
 
     ipc.on("resultVersion", function(evt, result){
+        console.log(result);
         let resultEl = document.getElementById("result-version");
         resultEl.innerHTML = result;
     });
