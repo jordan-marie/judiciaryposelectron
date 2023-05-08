@@ -81,6 +81,7 @@ app.on("ready", () => {
 	});
 
 	autoUpdater.on("error", (info) => {
+		console.log(info);
 		mainWindow.webContents.send("resultVersion", 'Something Goes wrong');
 	});
 
