@@ -68,17 +68,16 @@ app.on("ready", () => {
 
 	/*Download in progress */
 	autoUpdater.on("download-progress", (progressObj) => {
-		let logMessage = 'Download speed: ' + progressObj.bytesPerSecond;
-		logMessage += ' - Downloaded ' + progressObj.percent + '%';
-		logMessage += ' (' + progressObj.transferred +'/'+ progressObj.total + ')';
+		let logMessage = 'Download speed: ' + Math.ceil(progressObj.bytesPerSecond);
+		logMessage += ' - Downloaded ' + Math.ceil(progressObj.percent) + '%';
+		logMessage += ' (' + Math.ceil(progressObj.transferred) +'/'+ Math.ceil(progressObj.total) + ')';
 
 		mainWindow.webContents.send("resultVersion", logMessage);
 	});
 
 	/*Download Completion Message*/
 	autoUpdater.on("update-downloaded", (info) => {
-		mainWindow.webContents.send("resultVersion", 'Updates Downloaded');
-		autoUpdater.quitAndInstall();
+		mainWindow.webContents.send("resultVersion", '<button id="update-btn" class="btn btn-primary">Install new updates</button>');
 	});
 
 	autoUpdater.on("error", (info) => {
@@ -93,6 +92,10 @@ app.on("ready", () => {
 		}, ['name', 'value']).then(() => {
 			return 1;
 		});
+	});
+
+	ipcMain.on("software_update", (e, result) => {
+		autoUpdater.quitAndInstall();
 	});
 });
 

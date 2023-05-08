@@ -26,3 +26,9 @@ function profilePage(){
 }
 
 //document.getElementById('date-of-offender').value = new Date();
+
+$(document).on('click', '#update-btn', function(e){
+    e.preventDefault();
+    let result = null;
+    ipcRenderer.send('software_update', result);
+});
