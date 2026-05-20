@@ -26,7 +26,7 @@ $(document).ready(function () {
     });
 
     // 2. Theme Switcher Logic
-    const themeToggle = $('#themeToggle');
+    const themeToggle = $('.theme-toggle, #themeToggle');
     const htmlTag = $('html');
 
     // Initialize theme based on local storage or system preference
@@ -51,9 +51,9 @@ $(document).ready(function () {
     function updateThemeIcon(theme) {
         const icon = themeToggle.find('i');
         if (theme === 'dark') {
-            icon.removeClass('bi-moon-fill').addClass('bi-sun-fill');
+            icon.removeClass('bi-moon-stars').addClass('bi-sun');
         } else {
-            icon.removeClass('bi-sun-fill').addClass('bi-moon-fill');
+            icon.removeClass('bi-sun').addClass('bi-moon-stars');
         }
     }
 
@@ -165,4 +165,32 @@ $(document).ready(function () {
             window.deviceChart.update();
         }
     }
+
+// 6. Weighbridge Specific Logic
+if ($('#liveWeight').length) {
+    // Simulate live weight fluctuations
+    let baseWeight = 42560;
+    setInterval(function() {
+        let fluctuation = Math.floor(Math.random() * 20) - 10;
+        baseWeight += fluctuation;
+        $('#liveWeight').text(baseWeight.toLocaleString());
+    }, 1000);
+
+    // Form Handling
+    $('#btnCheckIn').on('click', function() {
+        $('#weighmentForm').removeClass('d-none');
+        $('html, body').animate({
+            scrollTop: $("#weighmentForm").offset().top - 100
+        }, 500);
+    });
+
+    $('#btnCancel').on('click', function() {
+        $('#weighmentForm').addClass('d-none');
+    });
+
+    $('#btnSubmitWeighment').on('click', function() {
+        alert('Transaction Recorded Successfully!');
+        $('#weighmentForm').addClass('d-none');
+    });
+}
 });

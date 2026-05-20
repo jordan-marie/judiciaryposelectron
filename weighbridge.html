@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weighbridge System | Admin Dashboard</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5.3.2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/custom.css">
+    <style>
+        .live-weight-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #10b981;
+            border: none;
+        }
+        .weight-display {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 5rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-online { background-color: #10b981; box-shadow: 0 0 10px #10b981; }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+        <!-- Sidebar Start -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3 class="mb-0 fs-4 fw-bold">Admin<span class="text-primary">Pro</span></h3>
+                <button type="button" class="btn btn-link text-white d-md-none sidebar-toggler">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li>
+                    <a href="index.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+                </li>
+                <li class="active">
+                    <a href="weighbridge.html"><i class="bi bi-truck"></i> <span>Weighbridge</span></a>
+                </li>
+                <li>
+                    <a href="#pageSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="bi bi-files"></i> <span>Pages</span>
+                    </a>
+                    <ul class="collapse list-unstyled ps-4" id="pageSubmenu">
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
+                        <li><a href="404.html">404 Error</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="bi bi-bar-chart-line"></i> <span>Analytics</span></a>
+                </li>
+                <li>
+                    <a href="#"><i class="bi bi-person"></i> <span>Profile</span></a>
+                </li>
+                <li>
+                    <a href="#"><i class="bi bi-gear"></i> <span>Settings</span></a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer p-3 position-absolute bottom-0 w-100 border-top border-secondary">
+                <a href="login.html" class="text-decoration-none text-white-50 small">
+                    <i class="bi bi-box-arrow-left me-2"></i> <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+        <!-- Sidebar End -->
+
+        <!-- Main Content Start -->
+        <div id="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <button type="button" class="btn btn-light border sidebar-toggler">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <div class="ms-3 d-none d-md-block">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item text-muted">Operations</li>
+                                <li class="breadcrumb-item active" aria-current="page">Weighbridge</li>
+                            </ol>
+                        </nav>
+                    </div>
+
+                    <div class="ms-auto d-flex align-items-center">
+                        <button class="btn btn-link text-body p-2" id="fullscreenToggle" title="Toggle Fullscreen">
+                            <i class="bi bi-arrows-fullscreen"></i>
+                        </button>
+
+                        <button class="btn btn-link text-body p-2 theme-toggle" title="Toggle Theme">
+                            <i class="bi bi-moon-stars"></i>
+                        </button>
+
+                        <button class="btn btn-link text-body p-2" data-bs-toggle="offcanvas" data-bs-target="#configDrawer" title="Settings">
+                            <i class="bi bi-gear"></i>
+                        </button>
+
+                        <div class="dropdown mx-2">
+                            <button class="btn btn-link text-body p-2 position-relative" data-bs-toggle="dropdown">
+                                <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">2</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li class="dropdown-header">System Alerts</li>
+                                <li><a class="dropdown-item py-2" href="#">Calibration Due in 5 days</a></li>
+                                <li><a class="dropdown-item py-2" href="#">Printer Paper Low</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="dropdown">
+                            <button class="btn btn-link p-0 dropdown-toggle no-caret" data-bs-toggle="dropdown">
+                                <img src="https://ui-avatars.com/api/?name=Operator&background=10b981&color=fff" alt="User" class="rounded-circle" width="32">
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="login.html"><i class="bi bi-box-arrow-left me-2"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- Navbar End -->
+
+            <!-- Main Content Area Start -->
+            <div class="container-fluid p-4">
+                <div class="row">
+                    <!-- Live Weight Display -->
+                    <div class="col-xl-8 col-lg-7 mb-4">
+                        <div class="card live-weight-card h-100 shadow-lg">
+                            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+                                <div class="mb-2">
+                                    <span class="status-indicator status-online"></span>
+                                    <span class="small fw-bold text-uppercase opacity-75">Scale #1 - Live Reading</span>
+                                </div>
+                                <div class="weight-display mb-2" id="liveWeight">42,560</div>
+                                <div class="fs-4 fw-bold text-uppercase">Kilograms</div>
+                                <div class="mt-4">
+                                    <button class="btn btn-outline-success px-4 me-2"><i class="bi bi-arrow-repeat me-2"></i>Zero Scale</button>
+                                    <button class="btn btn-outline-warning px-4"><i class="bi bi-shield-check me-2"></i>Calibration</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions / Status -->
+                    <div class="col-xl-4 col-lg-5 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-transparent border-0 pt-3">
+                                <h5 class="fw-bold mb-0">Operator Control</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-3">
+                                    <button class="btn btn-primary btn-lg py-3 d-flex align-items-center justify-content-center" id="btnCheckIn">
+                                        <i class="bi bi-box-arrow-in-right fs-4 me-3"></i>
+                                        <div class="text-start">
+                                            <div class="fw-bold">Vehicle Check-In</div>
+                                            <div class="small opacity-75">Record Initial Weight</div>
+                                        </div>
+                                    </button>
+                                    <button class="btn btn-success btn-lg py-3 d-flex align-items-center justify-content-center" id="btnCheckOut">
+                                        <i class="bi bi-box-arrow-left fs-4 me-3"></i>
+                                        <div class="text-start">
+                                            <div class="fw-bold">Vehicle Check-Out</div>
+                                            <div class="small opacity-75">Record Final Weight & Print</div>
+                                        </div>
+                                    </button>
+                                    <hr>
+                                    <div class="p-3 bg-light rounded">
+                                        <h6 class="fw-bold small text-uppercase text-muted mb-2">Today's Summary</h6>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Total Vehicles</span>
+                                            <span class="fw-bold">48</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Total Net Weight</span>
+                                            <span class="fw-bold">1,245.5 MT</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Errors/Alerts</span>
+                                            <span class="badge bg-danger">2</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction Form (Hidden by default, shown on Check-in) -->
+                <div class="row d-none" id="weighmentForm">
+                    <div class="col-12 mb-4">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white py-3">
+                                <h5 class="card-title mb-0">New Weighment Transaction</h5>
+                            </div>
+                            <div class="card-body">
+                                <form class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Vehicle Number</label>
+                                        <input type="text" class="form-control" placeholder="e.g. ABC-1234">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Driver Name</label>
+                                        <input type="text" class="form-control" placeholder="Full Name">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Material Type</label>
+                                        <select class="form-select">
+                                            <option selected>Select Material...</option>
+                                            <option>Steel Scrap</option>
+                                            <option>Copper Wire</option>
+                                            <option>Aluminum Ingots</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Customer/Supplier</label>
+                                        <input type="text" class="form-control" placeholder="Entity Name">
+                                    </div>
+                                    <div class="col-12 text-end">
+                                        <button type="button" class="btn btn-secondary me-2" id="btnCancel">Cancel</button>
+                                        <button type="button" class="btn btn-primary" id="btnSubmitWeighment">Submit Transaction</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-transparent border-0 d-flex align-items-center justify-content-between pt-3 px-3">
+                                <h5 class="fw-bold mb-0">In-Progress & Recent Transactions</h5>
+                                <div class="input-group input-group-sm w-auto">
+                                    <input type="text" class="form-control" placeholder="Search Vehicle...">
+                                    <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Slip #</th>
+                                                <th>Vehicle No</th>
+                                                <th>Material</th>
+                                                <th>Check-In Time</th>
+                                                <th>Gross Wt</th>
+                                                <th>Tare Wt</th>
+                                                <th>Net Wt</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="fw-bold">WB-10045</span></td>
+                                                <td>KAE-9920</td>
+                                                <td>Steel Scrap</td>
+                                                <td>10:24 AM</td>
+                                                <td>45,600 kg</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td><span class="badge bg-warning">In-Process</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Check-Out</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fw-bold">WB-10044</span></td>
+                                                <td>LUX-4421</td>
+                                                <td>Aluminum</td>
+                                                <td>09:15 AM</td>
+                                                <td>38,200 kg</td>
+                                                <td>12,400 kg</td>
+                                                <td>25,800 kg</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-light"><i class="bi bi-printer"></i></button>
+                                                    <button class="btn btn-sm btn-light"><i class="bi bi-eye"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Content Area End -->
+        </div>
+        <!-- Main Content End -->
+    </div>
+
+    <!-- Configuration Drawer (Same as index.html) -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="configDrawer">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold">Configuration</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3">Theme Mode</h6>
+                <button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-between theme-toggle">
+                    <span>Toggle Light/Dark</span>
+                    <i class="bi bi-moon-stars"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3">Scale Settings</h6>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">Auto-Zero</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">Print Ticket Auto</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
