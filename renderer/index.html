@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Industrial Weighbridge Application</title>
+  <link rel="stylesheet" href="css/app.css">
+  <!-- jQuery loaded locally or via script -->
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="app-header">
+    <div class="brand-title">
+      <span>WEIGHBRIDGE SYSTEM</span>
+      <span class="brand-badge">PRO v1.0</span>
+    </div>
+    <div class="header-controls">
+      <button id="themeToggleBtn" class="btn btn-outline" title="Toggle Light/Dark Theme">
+        <span id="themeIcon">🌙</span> Dark Mode
+      </button>
+      <button id="settingsToggleBtn" class="btn btn-primary">
+        ⚙️ Settings
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Industrial Dashboard Content -->
+  <main class="dashboard-container">
+    <!-- Left Column: Digital Weight & Camera Feed -->
+    <section class="left-panel">
+
+      <!-- Digital Weight Indicator Card -->
+      <div class="card weight-card">
+        <div class="weight-header">
+          <span>Digital Weight Display</span>
+          <span id="indicatorPortLabel">COM Port: Disconnected</span>
+        </div>
+        <div class="digital-meter">
+          <div id="weightDisplayValue" class="weight-value">000000</div>
+          <div id="weightUnitDisplay" class="weight-unit">KG</div>
+        </div>
+        <div class="weight-subinfo">
+          <span>Status: <strong id="weightStabilityText">STABLE</strong></span>
+          <span>Raw String: <code id="rawSerialText">\x02ST,GS,+000000kg\x03</code></span>
+        </div>
+      </div>
+
+      <!-- Live Camera Feed & OCR Section -->
+      <div class="card camera-card">
+        <div class="camera-header">
+          <h3>Live Camera & ROI Bounding Box</h3>
+          <span class="status-badge connected" id="cameraStatusBadge">
+            <span class="status-dot"></span> <span id="cameraStatusText">CAMERA ACTIVE</span>
+          </span>
+        </div>
+        <div class="camera-feed-container">
+          <video id="videoFeed" autoplay playsinline muted></video>
+          <canvas id="overlayCanvas"></canvas>
+          <div class="camera-overlay-info">
+            <span>Source: <strong id="camSourceLabel">Webcam</strong></span>
+            <span>FPS: <strong id="camFpsText">30</strong></span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Right Column: LPR Results, Transaction & Config Panel -->
+    <section class="right-panel">
+
+      <!-- License Plate OCR Recognition Card -->
+      <div class="card lpr-card">
+        <h3>License Plate Recognition (LPR)</h3>
+
+        <div class="plate-result-box">
+          <canvas id="plateCropCanvas" class="plate-thumbnail" width="120" height="48"></canvas>
+          <div class="plate-details">
+            <label for="plateInput">Detected Plate Number (Editable Override)</label>
+            <input type="text" id="plateInput" class="plate-number-input" value="PLATE_NOT_DETECTED" placeholder="Enter Plate Number">
+            <div class="plate-meta">
+              <span>Status: <strong id="lprStatusText">PLATE_NOT_DETECTED</strong></span>
+              <span>Confidence: <strong id="lprConfidenceText">0%</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <button id="triggerOcrBtn" class="btn btn-secondary" style="flex: 1;">📸 Trigger OCR Scan</button>
+          <button id="submitTransactionBtn" class="btn btn-success" style="flex: 1;">💾 Save Weighment</button>
+        </div>
+      </div>
+
+      <!-- Settings & Hardware Config Drawer / Card -->
+      <div class="card settings-card" id="settingsPanel">
+        <h3>Hardware & System Configuration</h3>
+
+        <!-- Serial Port Settings -->
+        <div class="form-group">
+          <label for="comPortSelect">COM Port</label>
+          <div style="display: flex; gap: 8px;">
+            <select id="comPortSelect" class="form-select" style="flex: 1;">
+              <option value="">-- Select COM Port --</option>
+            </select>
+            <button id="refreshPortsBtn" class="btn btn-outline" title="Refresh Ports">🔄</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="baudRateSelect">Baud Rate</label>
+            <select id="baudRateSelect" class="form-select">
+              <option value="9600" selected>9600</option>
+              <option value="19200">19200</option>
+              <option value="38400">38400</option>
+              <option value="115200">115200</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="paritySelect">Parity</label>
+            <select id="paritySelect" class="form-select">
+              <option value="none" selected>None</option>
+              <option value="even">Even</option>
+              <option value="odd">Odd</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dataBitsSelect">Data Bits</label>
+            <select id="dataBitsSelect" class="form-select">
+              <option value="8" selected>8</option>
+              <option value="7">7</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="stopBitsSelect">Stop Bits</label>
+            <select id="stopBitsSelect" class="form-select">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="delimiterSelect">Baud Delimiter</label>
+          <select id="delimiterSelect" class="form-select">
+            <option value="\r\n" selected>\r\n (CRLF)</option>
+            <option value="\n">\n (LF)</option>
+            <option value="\r">\r (CR)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="mockSerialCheckbox">
+            <span>Enable Mock Serial Indicator (Simulation Mode)</span>
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button id="connectSerialBtn" class="btn btn-primary" style="flex: 1;">Connect Serial</button>
+          <button id="disconnectSerialBtn" class="btn btn-danger" style="flex: 1;">Disconnect</button>
+        </div>
+
+        <hr style="border-color: var(--border-color); margin: 12px 0;">
+
+        <!-- Camera & OCR Settings -->
+        <div class="form-group">
+          <label for="cameraTypeSelect">Camera Source Type</label>
+          <select id="cameraTypeSelect" class="form-select">
+            <option value="webcam" selected>Webcam (HTML5 getUserMedia)</option>
+            <option value="ipcam">IP Camera (RTSP / Stream URL)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="ipCamUrlGroup" style="display: none;">
+          <label for="ipCamUrlInput">IP Camera Stream URL</label>
+          <input type="text" id="ipCamUrlInput" class="form-control" placeholder="http://192.168.1.100:8080/video">
+        </div>
+
+        <div class="form-group">
+          <label for="confidenceSlider">OCR Confidence Threshold (<span id="confidenceVal">70</span>%)</label>
+          <input type="range" id="confidenceSlider" min="10" max="95" value="70" style="width: 100%;">
+        </div>
+
+        <!-- REST API Settings -->
+        <div class="form-group">
+          <label for="apiUrlInput">REST API Backend Endpoint</label>
+          <input type="text" id="apiUrlInput" class="form-control" placeholder="https://api.weighbridge.com/v1/weighment" value="https://httpbin.org/post">
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Hardware Status Bar -->
+  <footer class="status-bar">
+    <div class="status-group">
+      <div class="status-item">
+        <span>Serial Port:</span>
+        <span class="status-badge disconnected" id="statusBarSerialBadge">
+          <span class="status-dot"></span> <span id="statusBarSerialText">DISCONNECTED</span>
+        </span>
+      </div>
+      <div class="status-item">
+        <span>Camera Feed:</span>
+        <span id="statusBarCameraText">INITIALIZING</span>
+      </div>
+    </div>
+    <div class="status-group">
+      <div class="status-item">
+        <span>API Connection:</span>
+        <span class="status-badge connected" id="statusBarApiBadge">
+          <span class="status-dot"></span> <span id="statusBarApiText">READY</span>
+        </span>
+      </div>
+      <div class="status-item">
+        <span id="systemTimeText">--:--:--</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Include jQuery -->
+  <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+  <!-- Frontend Controller Scripts -->
+  <script src="js/cameraController.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

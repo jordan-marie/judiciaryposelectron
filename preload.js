@@ -1,45 +1,33 @@
-const electron = require("electron");
-const ipc = electron.ipcRenderer;
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer } = require('electron');
 
-let displayInfo = () => {
-    ipc.send("mainWindowLoaded")
-    /*ipc.on("resultSent", function(evt, result){
-        let resultEl = document.getElementById("result");
-        console.log(result);
-        for(var i = 0; i < result.length;i++){
-            resultEl.innerHTML += "First Name: " + result[i].name.toString() + " - Last name: " +result[i].surname.toString()+ "<br/>";
-        }
-    });*/
+contextBridge.exposeInMainWorld('electronAPI', {
+  // Serial Port APIs
+  listSerialPorts: () => ipcRenderer.invoke('serial:list'),
+  connectSerialPort: (options) => ipcRenderer.invoke('serial:connect', options),
+  disconnectSerialPort: () => ipcRenderer.invoke('serial:disconnect'),
+  getSerialStatus: () => ipcRenderer.invoke('serial:status'),
 
-    ipc.on("resultVersion", function(evt, result){
-        console.log(result);
-        let resultEl = document.getElementById("result-version");
-        resultEl.innerHTML = result;
-    });
-}
+  // Serial Event Listeners
+  onSerialWeight: (callback) => {
+    const handler = (event, data) => callback(data);
+    ipcRenderer.on('serial:weight-data', handler);
+    return () => ipcRenderer.removeListener('serial:weight-data', handler);
+  },
+  onSerialStatusChanged: (callback) => {
+    const handler = (event, data) => callback(data);
+    ipcRenderer.on('serial:status-changed', handler);
+    return () => ipcRenderer.removeListener('serial:status-changed', handler);
+  },
+  onSerialNoise: (callback) => {
+    const handler = (event, data) => callback(data);
+    ipcRenderer.on('serial:noise', handler);
+    return () => ipcRenderer.removeListener('serial:noise', handler);
+  },
 
-let getSettings = () => {
-    ipc.send("settingsWindowLoaded")
-    ipc.on("get:settings", function(evt, result){
-        let i = 0;
-        while (i < result.length) {
-            //console.log(result[i]);
-            document.getElementById(result[i].name).value = result[i].value;
-            i++;
-        }
-    });
-}
+  // OCR Pipeline APIs
+  processOCRFrame: (imageInput, options) => ipcRenderer.invoke('ocr:process', { imageInput, options }),
+  setOCRConfidenceThreshold: (threshold) => ipcRenderer.invoke('ocr:set-threshold', threshold),
 
-let bridge = {
-    updateMessage: displayInfo,
-    settings: getSettings
-};
-
-contextBridge.exposeInMainWorld("bridge", bridge);
-
-//important code to access ipcRenderer on external html or js (at rendered level)
-contextBridge.exposeInMainWorld("ipcRenderer", {
-    send: (channel, data) => ipcRenderer.send(channel, data),
-    on: (channel, func) => ipcRenderer.on(channel, (event, ...args) => func(...args))
+  // REST API Endpoint Trigger
+  sendWeighmentData: (payload) => ipcRenderer.invoke('api:send-weighment', payload),
 });
