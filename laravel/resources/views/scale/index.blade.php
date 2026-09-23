@@ -21,7 +21,7 @@
             </label>
             <select id="form-switcher-select" class="form-select form-select-lg fw-bold border-primary shadow-sm">
                 @forelse($availableForms as $f)
-                    <option value="{{ $f->id }}" {{ ($activeForm && $activeForm->id == $f->id) ? 'selected' : '' }}>
+                    <option value="{{ $f->id }}" data-slug="{{ $f->slug }}" {{ ($activeForm && $activeForm->id == $f->id) ? 'selected' : '' }}>
                         {{ $f->name }}
                     </option>
                 @empty
@@ -61,6 +61,34 @@
     <div class="row g-4">
         <!-- Hardware Visual Cards & Pending Transactions Column -->
         <div class="col-12 col-xl-5">
+            <!-- Hardware Card 0: QR Code Scanner Reader Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 border-start border-4 border-primary">
+                <div class="card-header bg-body border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-uppercase d-flex align-items-center gap-2">
+                        <i class="bi bi-qr-code-scan text-primary"></i> QR Code Reader & Auto-Fill
+                    </h6>
+                    <span class="badge bg-primary-subtle text-primary">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Ready
+                    </span>
+                </div>
+                <div class="card-body p-3">
+                    <label for="qr-scan-input" class="form-label fw-bold small text-muted">Scan or Paste QR Code JSON Payload</label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-body-tertiary"><i class="bi bi-upc-scan"></i></span>
+                        <input type="text" id="qr-scan-input" class="form-control font-monospace" placeholder='e.g. {"form_slug": "waste-collection-form", "plate_number": "XYZ-9876", "fields": {...}}'>
+                        <button type="button" class="btn btn-primary fw-bold" id="btn-parse-qr">
+                            <i class="bi bi-box-arrow-in-down me-1"></i> Auto-Fill
+                        </button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted" style="font-size: 0.75rem;">Scan QR card to automatically switch form and pre-fill input fields.</small>
+                        <a href="{{ route('qrcode.generator') }}" target="_blank" class="small text-primary text-decoration-none fw-bold" style="font-size: 0.75rem;">
+                            <i class="bi bi-qr-code me-1"></i> QR Generator
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Hardware Card 1: Camera LPR Card -->
             <div class="card border-0 shadow-sm rounded-3 mb-4">
                 <div class="card-header bg-body border-bottom py-3 d-flex justify-content-between align-items-center">
@@ -271,11 +299,8 @@
             calculateNetWeight();
         });
 
-        // 2. Form Switcher Dropdown AJAX Logic
-        $('#form-switcher-select').on('change', function() {
-            const formId = $(this).val();
-            if (!formId) return;
-
+        // Function to load form dynamic fields
+        function loadFormFields(formId, callback) {
             $('#form_id_input').val(formId);
 
             $.ajax({
@@ -296,15 +321,108 @@
                         $('#form-description-text').text(response.description || '');
                         $('#form-field-count-badge').text(response.fields.length + ' Fields');
                         $('#dynamic-fields-container').html(response.html);
+
+                        if (typeof callback === 'function') {
+                            callback();
+                        }
                     }
                 },
                 error: function(xhr) {
                     alert('Failed to load form fields. Please try again.');
                 }
             });
+        }
+
+        // 2. Form Switcher Dropdown AJAX Logic
+        $('#form-switcher-select').on('change', function() {
+            const formId = $(this).val();
+            if (!formId) return;
+            loadFormFields(formId);
         });
 
-        // 3. Recall / Complete In-Progress Transaction AJAX Logic
+        // 3. QR Code Reader & Parsing Auto-Fill Logic
+        function parseAndApplyQrData(jsonText) {
+            if (!jsonText || !jsonText.trim()) return;
+
+            try {
+                const payload = JSON.parse(jsonText.trim());
+
+                // Find matching form ID by id or slug
+                let targetFormId = null;
+                if (payload.form_id) {
+                    targetFormId = payload.form_id;
+                } else if (payload.form_slug) {
+                    const matchedOption = $(`#form-switcher-select option[data-slug="${payload.form_slug}"]`);
+                    if (matchedOption.length) {
+                        targetFormId = matchedOption.val();
+                    }
+                }
+
+                if (!targetFormId) {
+                    // Try to find if form_id option exists directly
+                    const matchedOptionById = $(`#form-switcher-select option[value="${payload.form_id}"]`);
+                    if (matchedOptionById.length) {
+                        targetFormId = payload.form_id;
+                    }
+                }
+
+                if (!targetFormId) {
+                    alert('Form specified in QR code is not available or assigned to your role.');
+                    return;
+                }
+
+                // Switch form dropdown
+                $('#form-switcher-select').val(targetFormId);
+
+                // Load form fields and then apply payload values
+                loadFormFields(targetFormId, function() {
+                    if (payload.plate_number) {
+                        $('#plate_number').val(payload.plate_number.toUpperCase());
+                        $('#lpr-detected-text').text('PLATE: ' + payload.plate_number.toUpperCase());
+                    }
+                    if (payload.gross_weight !== undefined && payload.gross_weight !== null) {
+                        $('#gross_weight').val(parseFloat(payload.gross_weight).toFixed(2));
+                    }
+                    if (payload.tare_weight !== undefined && payload.tare_weight !== null) {
+                        $('#tare_weight').val(parseFloat(payload.tare_weight).toFixed(2));
+                    }
+                    calculateNetWeight();
+
+                    // Pre-fill dynamic meta fields
+                    if (payload.fields && typeof payload.fields === 'object') {
+                        for (let key in payload.fields) {
+                            const val = payload.fields[key];
+                            const inputElem = $(`#dynamic-fields-container [name="meta[${key}]"]`);
+                            if (inputElem.length) {
+                                if (inputElem.attr('type') === 'checkbox') {
+                                    inputElem.prop('checked', val == '1' || val === true);
+                                } else {
+                                    inputElem.val(val);
+                                }
+                            }
+                        }
+                    }
+
+                    alert('QR Code successfully parsed! Form and dynamic fields pre-filled.');
+                });
+
+            } catch (err) {
+                alert('Invalid QR Code JSON format: ' + err.message);
+            }
+        }
+
+        $('#btn-parse-qr').on('click', function() {
+            parseAndApplyQrData($('#qr-scan-input').val());
+        });
+
+        $('#qr-scan-input').on('keypress', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                parseAndApplyQrData($(this).val());
+            }
+        });
+
+        // 4. Recall / Complete In-Progress Transaction AJAX Logic
         $(document).on('click', '.btn-recall-tx', function() {
             const txId = $(this).data('id');
 
@@ -367,7 +485,7 @@
             calculateNetWeight();
         });
 
-        // 4. Hardware Mock Interactions
+        // 5. Hardware Mock Interactions
         $('#btn-capture-gross').on('click', function() {
             $('#gross_weight').val(simulatedLiveWeight.toFixed(2));
             calculateNetWeight();
@@ -401,7 +519,7 @@
             $('#plate_number').val(randomPlate);
         });
 
-        // 5. Form Submit AJAX
+        // 6. Form Submit AJAX
         $('#scale-transaction-form').on('submit', function(e) {
             e.preventDefault();
 

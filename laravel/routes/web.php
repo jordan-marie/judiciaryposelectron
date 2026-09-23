@@ -7,6 +7,7 @@ use App\Http\Controllers\ScaleConsoleController;
 use App\Http\Controllers\FormBuilderController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\QrCodeController;
 
 // Guest Routes
 Route::middleware('guest')->group(function () {
@@ -20,6 +21,9 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middle
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('dashboard', [DashboardController::class, 'index']);
+
+    // QR Code Generator Route
+    Route::get('qrcode-generator', [QrCodeController::class, 'index'])->name('qrcode.generator');
 
     // Scale Terminal Console Routes
     Route::get('scale', [ScaleConsoleController::class, 'index'])->name('scale.index');

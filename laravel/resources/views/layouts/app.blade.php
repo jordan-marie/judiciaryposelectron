@@ -173,6 +173,11 @@
                 <span>Transactions</span>
             </a>
 
+            <a href="{{ route('qrcode.generator') }}" class="nav-link {{ request()->routeIs('qrcode.*') ? 'active' : '' }}">
+                <i class="bi bi-qr-code-scan"></i>
+                <span>QR Generator</span>
+            </a>
+
             @role('Super Admin')
             <div class="px-3 mt-4 mb-2 text-uppercase text-secondary fs-7 fw-bold" style="font-size: 0.75rem;">Administration</div>
             <a href="{{ route('admin.forms.index') }}" class="nav-link {{ request()->routeIs('admin.forms.*') ? 'active' : '' }}">
