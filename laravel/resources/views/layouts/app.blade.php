@@ -14,6 +14,11 @@
         })();
     </script>
 
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <!-- Bootstrap 5.3.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -21,34 +26,66 @@
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 
-    <!-- Custom System Styles -->
+    <!-- Modern High-End UI Styles -->
     <style>
         :root {
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 74px;
+            --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+            --wb-card-bg: #ffffff;
+            --wb-card-border: rgba(0, 0, 0, 0.07);
+            --wb-card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+            --wb-gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --wb-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --wb-gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        [data-bs-theme="dark"] {
+            --wb-card-bg: #111827;
+            --wb-card-border: rgba(255, 255, 255, 0.08);
+            --wb-card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+            --wb-gradient-primary: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         }
 
         body {
+            font-family: var(--font-main);
             min-height: 100vh;
             background-color: var(--bs-body-bg);
             color: var(--bs-body-color);
             transition: background-color 0.2s ease, color 0.2s ease;
+            letter-spacing: -0.01em;
         }
 
-        /* App Wrapper Layout */
+        /* Modern Card Styling */
+        .card {
+            background-color: var(--wb-card-bg);
+            border: 1px solid var(--wb-card-border);
+            border-radius: 16px;
+            box-shadow: var(--wb-card-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--wb-card-border);
+            padding: 1.25rem 1.5rem;
+        }
+
+        /* App Layout Wrapper */
         #app-wrapper {
             display: flex;
             width: 100%;
             min-height: 100vh;
         }
 
-        /* Sidebar Styling */
+        /* Sleek Sidebar Navigation */
         #sidebar {
             width: var(--sidebar-width);
             min-width: var(--sidebar-width);
-            background: var(--bs-tertiary-bg);
-            border-right: 1px solid var(--bs-border-color);
-            transition: all 0.2s ease-in-out;
+            background: var(--wb-card-bg);
+            border-right: 1px solid var(--wb-card-border);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
         }
 
@@ -57,36 +94,47 @@
             min-width: var(--sidebar-collapsed-width);
         }
 
-        #sidebar.collapsed .sidebar-text {
-            display: none;
-        }
-
+        #sidebar.collapsed .sidebar-text,
         #sidebar.collapsed .brand-title {
             display: none;
         }
 
         #sidebar .nav-link {
-            padding: 0.75rem 1.25rem;
+            padding: 0.8rem 1.25rem;
             color: var(--bs-body-color);
-            border-radius: 0.375rem;
-            margin: 0.2rem 0.5rem;
+            border-radius: 12px;
+            margin: 0.25rem 0.75rem;
             display: flex;
             align-items: center;
+            font-weight: 600;
+            font-size: 0.925rem;
             white-space: nowrap;
+            transition: all 0.2s ease;
+            opacity: 0.8;
         }
 
         #sidebar .nav-link i {
             font-size: 1.25rem;
-            margin-right: 0.75rem;
+            margin-right: 0.85rem;
+            transition: transform 0.2s ease;
+        }
+
+        #sidebar .nav-link:hover {
+            opacity: 1;
+            background-color: rgba(37, 99, 235, 0.08);
+            color: var(--bs-primary);
+            transform: translateX(2px);
+        }
+
+        #sidebar .nav-link.active {
+            opacity: 1;
+            background: var(--wb-gradient-primary);
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.35);
         }
 
         #sidebar.collapsed .nav-link i {
             margin-right: 0;
-        }
-
-        #sidebar .nav-link.active, #sidebar .nav-link:hover {
-            background-color: var(--bs-primary);
-            color: #ffffff !important;
         }
 
         /* Main Content Container */
@@ -97,10 +145,52 @@
             min-width: 0;
         }
 
-        /* Top Navbar */
+        /* Modern Top Navbar */
         .navbar-top {
-            background-color: var(--bs-body-bg);
-            border-bottom: 1px solid var(--bs-border-color);
+            background-color: rgba(var(--bs-body-bg-rgb), 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--wb-card-border);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            padding: 0.85rem 1.5rem;
+        }
+
+        /* Buttons & Controls */
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.5rem 1.15rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--wb-gradient-primary);
+            border: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-success {
+            background: var(--wb-gradient-success);
+            border: none;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            border-color: var(--wb-card-border);
+            font-weight: 500;
+        }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            border-color: #2563eb;
         }
 
         /* Fullscreen Operator Mode Adjustments */
@@ -109,63 +199,65 @@
         }
 
         body.is-fullscreen .navbar-top {
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-        }
-
-        body.is-fullscreen .fullscreen-hide {
-            display: none !important;
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
         }
 
         body.is-fullscreen #main-content {
             padding: 0 !important;
         }
 
-        /* Hardware Indicator Cards styling */
+        /* High-Tech Hardware Indicator Displays */
         .digital-weight-display {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            background: #0d1117;
+            font-size: 3.25rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: radial-gradient(circle, #0f172a 0%, #020617 100%);
             color: #00ff66;
-            border-radius: 8px;
-            padding: 1rem;
-            text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
-        }
-
-        [data-bs-theme="dark"] .digital-weight-display {
-            background: #000000;
-            color: #00ff66;
-            border: 1px solid #1f2937;
+            border-radius: 14px;
+            padding: 1.25rem;
+            text-shadow: 0 0 15px rgba(0, 255, 102, 0.6);
+            border: 2px solid #1e293b;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
         }
 
         .lpr-camera-viewport {
-            background: #111827;
+            background: #090d16;
             position: relative;
-            border-radius: 8px;
+            border-radius: 14px;
             overflow: hidden;
-            min-height: 220px;
+            min-height: 230px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #9ca3af;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .lpr-viewfinder-overlay {
+            position: absolute;
+            inset: 15px;
+            border: 2px dashed rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            pointer-events: none;
         }
 
         .lpr-plate-badge {
             position: absolute;
-            bottom: 12px;
+            bottom: 14px;
             left: 50%;
             transform: translateX(-50%);
             background: #facc15;
-            color: #000;
+            color: #0f172a;
             font-weight: 900;
-            font-size: 1.4rem;
-            letter-spacing: 3px;
-            padding: 4px 16px;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            padding: 6px 20px;
             border: 3px solid #000;
-            border-radius: 6px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+            text-shadow: none;
         }
     </style>
 
@@ -177,18 +269,20 @@
         <nav id="sidebar" class="d-flex flex-column flex-shrink-0">
             <div class="p-3 d-flex align-items-center justify-content-between border-bottom">
                 <a href="{{ route('dashboard') }}" class="d-flex align-items-center text-decoration-none color-inherit">
-                    <i class="bi bi-truck text-primary fs-3 me-2"></i>
-                    <span class="fs-5 fw-bold brand-title">WeighSys</span>
+                    <div class="rounded-3 bg-primary text-white p-2 d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 38px; height: 38px;">
+                        <i class="bi bi-truck fs-5"></i>
+                    </div>
+                    <span class="fs-5 fw-extrabold brand-title tracking-tight">WeighSys</span>
                 </a>
                 <button id="sidebarToggleBtn" class="btn btn-sm btn-outline-secondary border-0 d-none d-md-block" title="Toggle Sidebar">
-                    <i class="bi bi-list"></i>
+                    <i class="bi bi-layout-sidebar"></i>
                 </button>
             </div>
 
             <ul class="nav nav-pills flex-column mb-auto pt-3">
                 <li class="nav-item">
                     <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                        <i class="bi bi-speedometer2"></i>
+                        <i class="bi bi-grid-1x2"></i>
                         <span class="sidebar-text">Dashboard</span>
                     </a>
                 </li>
@@ -196,7 +290,7 @@
                 @can('create-transactions')
                 <li class="nav-item">
                     <a href="{{ route('transactions.create') }}" class="nav-link {{ request()->routeIs('transactions.create') ? 'active' : '' }}">
-                        <i class="bi bi-aspect-ratio"></i>
+                        <i class="bi bi-speedometer2"></i>
                         <span class="sidebar-text">Scale Operator</span>
                     </a>
                 </li>
@@ -205,7 +299,7 @@
                 @can('view-transactions')
                 <li class="nav-item">
                     <a href="{{ route('transactions.index') }}" class="nav-link {{ request()->routeIs('transactions.index') || request()->routeIs('transactions.show') ? 'active' : '' }}">
-                        <i class="bi bi-receipt"></i>
+                        <i class="bi bi-receipt-cutoff"></i>
                         <span class="sidebar-text">Transactions</span>
                     </a>
                 </li>
@@ -223,7 +317,7 @@
                 @can('manage-roles')
                 <li class="nav-item">
                     <a href="{{ route('roles.index') }}" class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}">
-                        <i class="bi bi-shield-lock"></i>
+                        <i class="bi bi-shield-check"></i>
                         <span class="sidebar-text">Roles & Permissions</span>
                     </a>
                 </li>
@@ -232,15 +326,15 @@
 
             <div class="p-3 border-top">
                 @auth
-                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-body-tertiary">
                     <div class="sidebar-text overflow-hidden me-2">
-                        <div class="fw-bold text-truncate">{{ Auth::user()->name }}</div>
-                        <small class="text-muted d-block text-truncate">{{ Auth::user()->roles->pluck('name')->implode(', ') ?: 'User' }}</small>
+                        <div class="fw-bold text-truncate fs-7">{{ Auth::user()->name }}</div>
+                        <small class="text-muted d-block text-truncate fs-8">{{ Auth::user()->roles->pluck('name')->implode(', ') ?: 'User' }}</small>
                     </div>
                     <form action="{{ route('logout') }}" method="POST" class="d-inline">
                         @csrf
-                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Logout">
-                            <i class="bi bi-box-arrow-right"></i>
+                        <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Logout">
+                            <i class="bi bi-box-arrow-right fs-6"></i>
                         </button>
                     </form>
                 </div>
@@ -251,25 +345,25 @@
         <!-- Main Content Wrapper -->
         <div id="main-content">
             <!-- Top Navbar -->
-            <nav class="navbar navbar-expand navbar-top px-3">
+            <nav class="navbar navbar-expand navbar-top">
                 <div class="container-fluid p-0">
                     <button class="btn btn-outline-secondary d-md-none me-2" id="sidebarMobileToggle">
                         <i class="bi bi-list"></i>
                     </button>
 
-                    <h5 class="mb-0 fw-bold d-none d-sm-inline-block">@yield('header-title', 'Weighbridge Management System')</h5>
+                    <h5 class="mb-0 fw-bold d-none d-sm-inline-block tracking-tight">@yield('header-title', 'Weighbridge Management System')</h5>
 
                     <div class="ms-auto d-flex align-items-center gap-2">
                         <!-- Fullscreen Operator Mode Button -->
-                        <button id="fullscreenToggleBtn" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" title="Toggle Operator Fullscreen Mode (Alt + F)">
+                        <button id="fullscreenToggleBtn" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1.5 shadow-sm" title="Toggle Operator Fullscreen Mode (Alt + F)">
                             <i class="bi bi-arrows-fullscreen"></i>
-                            <span class="d-none d-md-inline">Fullscreen</span>
-                            <span class="badge bg-secondary d-none d-lg-inline ms-1" style="font-size: 0.65rem;">Alt+F</span>
+                            <span class="d-none d-md-inline">Fullscreen View</span>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle d-none d-lg-inline ms-1" style="font-size: 0.65rem;">Alt+F</span>
                         </button>
 
                         <!-- Light/Dark Theme Switcher -->
                         <button id="themeToggleBtn" class="btn btn-outline-secondary btn-sm" title="Toggle Light/Dark Theme">
-                            <i class="bi bi-moon-stars" id="themeToggleIcon"></i>
+                            <i class="bi bi-moon-stars-fill" id="themeToggleIcon"></i>
                         </button>
                     </div>
                 </div>
@@ -278,15 +372,15 @@
             <!-- Page Body Content -->
             <main class="p-3 p-md-4 flex-grow-1">
                 @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                    <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show mb-4 d-flex align-items-center" role="alert">
+                        <i class="bi bi-check-circle-fill fs-5 me-2"></i> <div>{{ session('success') }}</div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+                    <div class="alert alert-danger border-0 shadow-sm alert-dismissible fade show mb-4 d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i> <div>{{ session('error') }}</div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
@@ -295,8 +389,8 @@
             </main>
 
             <!-- Footer -->
-            <footer class="footer mt-auto py-2 px-3 border-top text-center text-muted fs-7">
-                <small>&copy; {{ date('Y') }} WeighSys Weighbridge Management System | Built with Laravel 11 & Bootstrap 5.3.3</small>
+            <footer class="footer mt-auto py-3 px-4 border-top text-center text-muted fs-7">
+                <small>&copy; {{ date('Y') }} WeighSys Management Terminal | Modernized Industrial Solution</small>
             </footer>
         </div>
     </div>
@@ -326,10 +420,10 @@
                 document.documentElement.setAttribute('data-bs-theme', theme);
                 localStorage.setItem('wb_theme', theme);
                 if (theme === 'dark') {
-                    themeToggleIcon.removeClass('bi-moon-stars').addClass('bi-sun-fill');
+                    themeToggleIcon.removeClass('bi-moon-stars-fill').addClass('bi-sun-fill');
                     themeToggleBtn.removeClass('btn-outline-secondary').addClass('btn-outline-warning');
                 } else {
-                    themeToggleIcon.removeClass('bi-sun-fill').addClass('bi-moon-stars');
+                    themeToggleIcon.removeClass('bi-sun-fill').addClass('bi-moon-stars-fill');
                     themeToggleBtn.removeClass('btn-outline-warning').addClass('btn-outline-secondary');
                 }
             }
@@ -386,7 +480,7 @@
                     fullscreenToggleBtn.find('i').removeClass('bi-arrows-fullscreen').addClass('bi-fullscreen-exit');
                 } else {
                     $('body').removeClass('is-fullscreen');
-                    fullscreenToggleBtn.find('span.d-none.d-md-inline').text('Fullscreen');
+                    fullscreenToggleBtn.find('span.d-none.d-md-inline').text('Fullscreen View');
                     fullscreenToggleBtn.find('i').removeClass('bi-fullscreen-exit').addClass('bi-arrows-fullscreen');
                 }
             });

@@ -64,7 +64,7 @@ class WeighbridgeTest extends TestCase
 
         $response = $this->get('/transactions/create');
         $response->assertStatus(200);
-        $response->assertSee('Digital Weighbridge Indicator Panel');
+        $response->assertSee('Digital Scale Indicator Readout');
 
         $txData = [
             'transaction_code' => 'WB-2026-TEST',
