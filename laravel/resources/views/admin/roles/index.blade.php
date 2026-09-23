@@ -3,29 +3,57 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="fw-bold mb-1">Roles & Permissions Management</h3>
-        <p class="text-muted small mb-0">Manage system roles and assign role permissions to users</p>
+        <h3 class="fw-bold mb-1">Roles & Form Permissions Management</h3>
+        <p class="text-muted small mb-0">Manage system roles, assign form access permissions per role, and assign user roles</p>
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Roles List Card -->
-    <div class="col-12 col-lg-5">
+<div class="row g-4 mb-4">
+    <!-- Roles & Form Permission Assignment Cards -->
+    <div class="col-12 col-lg-6">
         <div class="card border-0 shadow-sm rounded-3 mb-4">
-            <div class="card-header bg-body border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0">System Roles</h5>
+            <div class="card-header bg-body border-bottom py-3">
+                <h5 class="fw-bold mb-0">System Roles & Form Permissions</h5>
             </div>
             <div class="card-body p-0">
-                <ul class="list-group list-group-flush">
+                <div class="accordion accordion-flush" id="rolesAccordion">
                     @foreach($roles as $role)
-                        <li class="list-group-item p-3 d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="fw-bold text-primary">{{ $role->name }}</span>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading_{{ $role->id }}">
+                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $role->id }}" aria-expanded="false" aria-controls="collapse_{{ $role->id }}">
+                                    <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                        <span class="text-primary">{{ $role->name }}</span>
+                                        <span class="badge bg-primary-subtle text-primary rounded-pill">{{ $role->forms->count() }} Forms Assigned</span>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse_{{ $role->id }}" class="accordion-collapse collapse" aria-labelledby="heading_{{ $role->id }}" data-bs-parent="#rolesAccordion">
+                                <div class="accordion-body bg-body-tertiary">
+                                    <form action="{{ route('admin.roles.update-forms', $role->id) }}" method="POST">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-uppercase text-secondary">Form Access Permissions</label>
+                                            @php
+                                                $assignedFormIds = $role->forms->pluck('id')->toArray();
+                                            @endphp
+                                            @foreach($forms as $f)
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="checkbox" name="forms[]" value="{{ $f->id }}" id="role_{{ $role->id }}_form_{{ $f->id }}" {{ in_array($f->id, $assignedFormIds) ? 'checked' : '' }}>
+                                                    <label class="form-check-label fw-semibold" for="role_{{ $role->id }}_form_{{ $f->id }}">
+                                                        {{ $f->name }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-primary fw-bold">
+                                            <i class="bi bi-save me-1"></i> Save Form Permissions
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                            <span class="badge bg-primary-subtle text-primary rounded-pill">{{ $role->users_count }} Users</span>
-                        </li>
+                        </div>
                     @endforeach
-                </ul>
+                </div>
             </div>
         </div>
 
@@ -41,6 +69,19 @@
                         <label for="role_name" class="form-label fw-semibold">Role Name</label>
                         <input type="text" class="form-control" id="role_name" name="name" placeholder="e.g. Weighbridge Auditor" required>
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Assign Initial Form Access</label>
+                        @foreach($forms as $f)
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox" name="forms[]" value="{{ $f->id }}" id="new_role_form_{{ $f->id }}">
+                                <label class="form-check-label small" for="new_role_form_{{ $f->id }}">
+                                    {{ $f->name }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+
                     <button type="submit" class="btn btn-primary fw-bold w-100">Create Role</button>
                 </form>
             </div>
@@ -48,7 +89,7 @@
     </div>
 
     <!-- User Role Assignment Table -->
-    <div class="col-12 col-lg-7">
+    <div class="col-12 col-lg-6">
         <div class="card border-0 shadow-sm rounded-3">
             <div class="card-header bg-body border-bottom py-3">
                 <h5 class="fw-bold mb-0">User Role Assignments</h5>

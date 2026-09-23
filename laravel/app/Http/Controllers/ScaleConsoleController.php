@@ -8,7 +8,6 @@ use App\Models\Transaction;
 use App\Models\TransactionMeta;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class ScaleConsoleController extends Controller
 {
@@ -26,7 +25,6 @@ class ScaleConsoleController extends Controller
                 $query->whereIn('roles.id', $userRoleIds);
             });
 
-        // Super Admin can see all active forms if desired
         if ($user->hasRole('Super Admin')) {
             $formsQuery = Form::where('is_active', true);
         }
@@ -44,7 +42,13 @@ class ScaleConsoleController extends Controller
             $activeForm = $availableForms->first();
         }
 
-        return view('scale.index', compact('availableForms', 'activeForm'));
+        // Fetch all in-progress / uncompleted transactions
+        $pendingTransactions = Transaction::where('status', 'in_progress')
+            ->with(['form', 'creator', 'meta'])
+            ->latest()
+            ->get();
+
+        return view('scale.index', compact('availableForms', 'activeForm', 'pendingTransactions'));
     }
 
     /**
@@ -55,7 +59,6 @@ class ScaleConsoleController extends Controller
         $user = Auth::user();
         $userRoleIds = $user->roles->pluck('id')->toArray();
 
-        // Check if user has role access
         if (!$user->hasRole('Super Admin')) {
             $hasAccess = $form->roles()->whereIn('roles.id', $userRoleIds)->exists();
             if (!$hasAccess || !$form->is_active) {
@@ -78,11 +81,35 @@ class ScaleConsoleController extends Controller
     }
 
     /**
-     * Save a new weighbridge transaction.
+     * AJAX endpoint to fetch details of a pending transaction to recall/complete on scale console.
+     */
+    public function getTransactionData(Transaction $transaction)
+    {
+        $transaction->load(['form.fields', 'meta']);
+
+        $metaMap = $transaction->meta->pluck('field_value', 'field_name')->toArray();
+
+        $html = view('scale.partials.dynamic_fields', [
+            'form' => $transaction->form,
+            'metaValues' => $metaMap
+        ])->render();
+
+        return response()->json([
+            'success' => true,
+            'transaction' => $transaction,
+            'form' => $transaction->form,
+            'meta' => $metaMap,
+            'html' => $html
+        ]);
+    }
+
+    /**
+     * Save or update a weighbridge transaction.
      */
     public function storeTransaction(Request $request)
     {
         $validated = $request->validate([
+            'transaction_id' => 'nullable|exists:transactions,id',
             'form_id' => 'required|exists:forms,id',
             'gross_weight' => 'required|numeric|min:0',
             'tare_weight' => 'required|numeric|min:0',
@@ -94,47 +121,66 @@ class ScaleConsoleController extends Controller
 
         $form = Form::with('fields')->findOrFail($validated['form_id']);
 
-        // Validate dynamic required fields
-        foreach ($form->fields as $field) {
-            if ($field->is_required) {
-                $metaVal = $request->input("meta.{$field->field_name}");
-                if (is_null($metaVal) || $metaVal === '') {
-                    if ($request->wantsJson()) {
-                        return response()->json([
-                            'message' => "The field '{$field->label}' is required.",
-                            'errors' => ["meta.{$field->field_name}" => ["The {$field->label} field is required."]]
-                        ], 422);
+        // Validate dynamic required fields if completing
+        if ($validated['status'] === 'completed') {
+            foreach ($form->fields as $field) {
+                if ($field->is_required) {
+                    $metaVal = $request->input("meta.{$field->field_name}");
+                    if (is_null($metaVal) || $metaVal === '') {
+                        if ($request->wantsJson()) {
+                            return response()->json([
+                                'message' => "The field '{$field->label}' is required.",
+                                'errors' => ["meta.{$field->field_name}" => ["The {$field->label} field is required."]]
+                            ], 422);
+                        }
+                        return back()->withErrors(["meta.{$field->field_name}" => "The {$field->label} field is required."])->withInput();
                     }
-                    return back()->withErrors(["meta.{$field->field_name}" => "The {$field->label} field is required."])->withInput();
                 }
             }
         }
 
         $transaction = DB::transaction(function () use ($validated, $request, $form) {
-            // Generate unique transaction code
-            $todayStr = date('Ymd');
-            $latestCount = Transaction::whereDate('created_at', now()->toDateString())->count() + 1;
-            $code = 'WB-' . $todayStr . '-' . str_pad($latestCount, 4, '0', STR_PAD_LEFT);
+            if (!empty($validated['transaction_id'])) {
+                // Updating an existing pending transaction
+                $tx = Transaction::findOrFail($validated['transaction_id']);
+                $tx->update([
+                    'form_id' => $form->id,
+                    'status' => $validated['status'],
+                    'gross_weight' => $validated['gross_weight'],
+                    'tare_weight' => $validated['tare_weight'],
+                    'net_weight' => $validated['net_weight'],
+                    'plate_number' => $validated['plate_number'] ?? $tx->plate_number,
+                ]);
+            } else {
+                // Creating a new transaction
+                $todayStr = date('Ymd');
+                $latestCount = Transaction::whereDate('created_at', now()->toDateString())->count() + 1;
+                $code = 'WB-' . $todayStr . '-' . str_pad($latestCount, 4, '0', STR_PAD_LEFT);
 
-            $tx = Transaction::create([
-                'transaction_code' => $code,
-                'form_id' => $form->id,
-                'status' => $validated['status'],
-                'gross_weight' => $validated['gross_weight'],
-                'tare_weight' => $validated['tare_weight'],
-                'net_weight' => $validated['net_weight'],
-                'plate_number' => $validated['plate_number'] ?? null,
-                'created_by' => Auth::id(),
-            ]);
+                $tx = Transaction::create([
+                    'transaction_code' => $code,
+                    'form_id' => $form->id,
+                    'status' => $validated['status'],
+                    'gross_weight' => $validated['gross_weight'],
+                    'tare_weight' => $validated['tare_weight'],
+                    'net_weight' => $validated['net_weight'],
+                    'plate_number' => $validated['plate_number'] ?? null,
+                    'created_by' => Auth::id(),
+                ]);
+            }
 
-            // Save meta values
+            // Save or update meta values
             if (!empty($validated['meta']) && is_array($validated['meta'])) {
                 foreach ($validated['meta'] as $fieldName => $value) {
-                    TransactionMeta::create([
-                        'transaction_id' => $tx->id,
-                        'field_name' => $fieldName,
-                        'field_value' => is_array($value) ? json_encode($value) : (string)$value,
-                    ]);
+                    TransactionMeta::updateOrCreate(
+                        [
+                            'transaction_id' => $tx->id,
+                            'field_name' => $fieldName
+                        ],
+                        [
+                            'field_value' => is_array($value) ? json_encode($value) : (string)$value,
+                        ]
+                    );
                 }
             }
 

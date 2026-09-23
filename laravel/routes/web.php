@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
     // Scale Terminal Console Routes
     Route::get('scale', [ScaleConsoleController::class, 'index'])->name('scale.index');
     Route::get('scale/forms/{form}/fields', [ScaleConsoleController::class, 'getFormFields'])->name('scale.fields');
+    Route::get('scale/transactions/{transaction}/data', [ScaleConsoleController::class, 'getTransactionData'])->name('scale.transaction-data');
     Route::post('scale/transactions', [ScaleConsoleController::class, 'storeTransaction'])->name('scale.store');
 
     // Transactions Log & Query Routes
@@ -46,6 +47,7 @@ Route::middleware('auth')->group(function () {
         // Role & User Permission Routes
         Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
         Route::post('roles', [RoleController::class, 'storeRole'])->name('roles.store');
+        Route::post('roles/{role}/forms', [RoleController::class, 'updateRoleForms'])->name('roles.update-forms');
         Route::post('users/{user}/roles', [RoleController::class, 'updateUserRoles'])->name('users.update-roles');
     });
 });

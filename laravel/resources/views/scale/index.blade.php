@@ -40,12 +40,26 @@
     </div>
 @else
 
+<!-- Active Recalled Transaction Banner (Hidden by default) -->
+<div id="recalled-tx-banner" class="alert alert-info alert-dismissible fade show shadow-sm mb-4 d-none" role="alert">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <i class="bi bi-arrow-repeat me-2 fs-5"></i>
+            <strong>Recalled In-Progress Transaction:</strong> <span id="recalled-code-text" class="font-monospace fw-bold"></span> (Completing 2nd Weighment)
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-cancel-recall">
+            <i class="bi bi-x-circle me-1"></i> Switch to New Entry
+        </button>
+    </div>
+</div>
+
 <form id="scale-transaction-form" action="{{ route('scale.store') }}" method="POST">
     @csrf
     <input type="hidden" name="form_id" id="form_id_input" value="{{ $activeForm->id }}">
+    <input type="hidden" name="transaction_id" id="transaction_id_input" value="">
 
     <div class="row g-4">
-        <!-- Hardware Visual Cards Column -->
+        <!-- Hardware Visual Cards & Pending Transactions Column -->
         <div class="col-12 col-xl-5">
             <!-- Hardware Card 1: Camera LPR Card -->
             <div class="card border-0 shadow-sm rounded-3 mb-4">
@@ -83,7 +97,7 @@
             </div>
 
             <!-- Hardware Card 2: Weighbridge Indicator Card -->
-            <div class="card border-0 shadow-sm rounded-3">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
                 <div class="card-header bg-body border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h6 class="fw-bold mb-0 text-uppercase d-flex align-items-center gap-2">
                         <i class="bi bi-speedometer2 text-success"></i> Weighbridge Indicator
@@ -108,6 +122,50 @@
                     </div>
                 </div>
             </div>
+
+            <!-- In-Progress Transactions Panel (Pending 2nd Weighment) -->
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-body border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-uppercase d-flex align-items-center gap-2">
+                        <i class="bi bi-hourglass-split text-warning"></i> In-Progress Weighments
+                    </h6>
+                    <span class="badge bg-warning text-dark fw-bold" id="pending-count-badge">
+                        {{ $pendingTransactions->count() }} Pending
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th class="ps-3">Code</th>
+                                    <th>Plate</th>
+                                    <th>1st Wt (KG)</th>
+                                    <th class="text-end pe-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pendingTransactions as $pending)
+                                    <tr id="pending-row-{{ $pending->id }}">
+                                        <td class="ps-3 fw-bold font-monospace small text-primary">{{ $pending->transaction_code }}</td>
+                                        <td class="fw-bold text-uppercase small">{{ $pending->plate_number ?? 'N/A' }}</td>
+                                        <td class="small">{{ number_format($pending->gross_weight, 0) }}</td>
+                                        <td class="text-end pe-3">
+                                            <button type="button" class="btn btn-sm btn-warning fw-bold btn-recall-tx" data-id="{{ $pending->id }}" title="Recall transaction to complete 2nd weighment">
+                                                <i class="bi bi-box-arrow-in-right me-1"></i> Complete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted small">No in-progress weighments pending.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Transaction Entry Card Column -->
@@ -124,7 +182,7 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <!-- Dynamic Dynamic Form Inputs Container -->
+                    <!-- Dynamic Form Inputs Container -->
                     <div class="mb-4">
                         <h6 class="fw-bold text-uppercase text-secondary border-bottom pb-2 mb-3" style="font-size: 0.8rem;">
                             <i class="bi bi-input-cursor-text me-1"></i> Dynamic Form Inputs
@@ -182,7 +240,7 @@
 
                     <!-- Submit Actions -->
                     <div class="d-flex justify-content-end gap-2 border-top pt-3">
-                        <button type="reset" class="btn btn-outline-secondary">Reset Fields</button>
+                        <button type="button" class="btn btn-outline-secondary" id="btn-reset-form">Reset Fields</button>
                         <button type="submit" class="btn btn-primary btn-lg fw-bold px-4" id="btn-save-transaction">
                             <i class="bi bi-save-fill me-1"></i> Submit Weighment Entry
                         </button>
@@ -220,7 +278,6 @@
 
             $('#form_id_input').val(formId);
 
-            // AJAX call to get form dynamic fields
             $.ajax({
                 url: `/scale/forms/${formId}/fields`,
                 type: 'GET',
@@ -247,12 +304,74 @@
             });
         });
 
-        // 3. Hardware Mock Interactions (Capture Weight, Zero Scale, Re-Scan LPR)
+        // 3. Recall / Complete In-Progress Transaction AJAX Logic
+        $(document).on('click', '.btn-recall-tx', function() {
+            const txId = $(this).data('id');
+
+            $.ajax({
+                url: `/scale/transactions/${txId}/data`,
+                type: 'GET',
+                dataType: 'json',
+                beforeSend: function() {
+                    $('#recalled-tx-banner').removeClass('d-none');
+                    $('#recalled-code-text').text('Loading transaction #' + txId + '...');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const tx = response.transaction;
+                        $('#transaction_id_input').val(tx.id);
+                        $('#form_id_input').val(tx.form_id);
+
+                        // Select corresponding form in dropdown
+                        $('#form-switcher-select').val(tx.form_id);
+                        if (response.form) {
+                            $('#form-title-text').text(response.form.name);
+                            $('#form-description-text').text(response.form.description || '');
+                        }
+
+                        // Populate weights and plate
+                        $('#gross_weight').val(parseFloat(tx.gross_weight).toFixed(2));
+                        $('#tare_weight').val(parseFloat(tx.tare_weight).toFixed(2));
+                        if (tx.plate_number) {
+                            $('#plate_number').val(tx.plate_number);
+                            $('#lpr-detected-text').text('PLATE: ' + tx.plate_number);
+                        }
+                        calculateNetWeight();
+
+                        // Set status to completed for 2nd weight
+                        $('#status').val('completed');
+
+                        // Render dynamic fields with recalled meta values
+                        $('#dynamic-fields-container').html(response.html);
+
+                        // Show banner
+                        $('#recalled-code-text').text(tx.transaction_code);
+                    }
+                },
+                error: function() {
+                    alert('Error recalling transaction details.');
+                }
+            });
+        });
+
+        // Reset recalled transaction state back to new entry
+        function resetRecalledState() {
+            $('#transaction_id_input').val('');
+            $('#recalled-tx-banner').addClass('d-none');
+            $('#status').val('completed');
+        }
+
+        $('#btn-cancel-recall, #btn-reset-form').on('click', function() {
+            resetRecalledState();
+            $('#scale-transaction-form')[0].reset();
+            calculateNetWeight();
+        });
+
+        // 4. Hardware Mock Interactions
         $('#btn-capture-gross').on('click', function() {
             $('#gross_weight').val(simulatedLiveWeight.toFixed(2));
             calculateNetWeight();
 
-            // Temporary flash effect on indicator
             $('#live-weight-display').addClass('border-success');
             setTimeout(() => $('#live-weight-display').removeClass('border-success'), 600);
         });
@@ -282,7 +401,7 @@
             $('#plate_number').val(randomPlate);
         });
 
-        // 4. Form Submit AJAX
+        // 5. Form Submit AJAX
         $('#scale-transaction-form').on('submit', function(e) {
             e.preventDefault();
 

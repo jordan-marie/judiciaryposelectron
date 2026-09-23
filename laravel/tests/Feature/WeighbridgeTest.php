@@ -58,6 +58,25 @@ class WeighbridgeTest extends TestCase
         $response->assertDontSee('Restricted Auditor Form');
     }
 
+    public function test_super_admin_can_update_role_form_permissions(): void
+    {
+        $admin = User::where('email', 'admin@weighbridge.com')->first();
+        $scaleRole = Role::where('name', 'Scale Operator')->first();
+        $form = Form::where('slug', 'scrap-metal-export-form')->first();
+
+        // Initially scaleRole does not have form 3
+        $this->assertFalse($scaleRole->forms->contains($form->id));
+
+        // Admin updates role form permissions
+        $response = $this->actingAs($admin)->post("/admin/roles/{$scaleRole->id}/forms", [
+            'forms' => [$form->id]
+        ]);
+        $response->assertRedirect();
+
+        $scaleRole->refresh();
+        $this->assertTrue($scaleRole->forms->contains($form->id));
+    }
+
     public function test_super_admin_can_create_dynamic_form_with_roles_and_fields(): void
     {
         $admin = User::where('email', 'admin@weighbridge.com')->first();
@@ -143,6 +162,41 @@ class WeighbridgeTest extends TestCase
             'transaction_id' => $tx->id,
             'field_name' => 'customer_name',
             'field_value' => 'Acme Recycling Corp'
+        ]);
+    }
+
+    public function test_operator_can_recall_and_complete_in_progress_transaction(): void
+    {
+        $operator = User::where('email', 'operator@weighbridge.com')->first();
+        $inProgressTx = Transaction::where('status', 'in_progress')->first();
+
+        // 1. Get transaction recall data
+        $response = $this->actingAs($operator)->getJson("/scale/transactions/{$inProgressTx->id}/data");
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        // 2. Submit completion update
+        $payload = [
+            'transaction_id' => $inProgressTx->id,
+            'form_id' => $inProgressTx->form_id,
+            'gross_weight' => $inProgressTx->gross_weight,
+            'tare_weight' => 8200,
+            'net_weight' => $inProgressTx->gross_weight - 8200,
+            'plate_number' => $inProgressTx->plate_number,
+            'status' => 'completed',
+            'meta' => [
+                'customer_name' => 'Green Energy Bio-Fuels',
+                'waste_material_type' => 'Organic Compost'
+            ]
+        ];
+
+        $response = $this->actingAs($operator)->postJson('/scale/transactions', $payload);
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $inProgressTx->id,
+            'status' => 'completed',
+            'tare_weight' => 8200
         ]);
     }
 
