@@ -68,14 +68,25 @@
                     <input type="date" class="form-control form-control-sm" id="date_to" name="date_to" value="{{ request('date_to') }}">
                 </div>
 
-                <!-- Dynamic Custom Field Filter Input -->
+                <!-- Grouped Select2 Dynamic Custom Field Filter Dropdown -->
                 <div class="col-12 col-md-5">
-                    <label for="meta_field" class="form-label small fw-bold">Dynamic Meta Key</label>
-                    <input type="text" class="form-control form-control-sm" id="meta_field" name="meta_field" value="{{ request('meta_field') }}" placeholder="e.g. customer_name or waste_material_type">
+                    <label for="meta_field" class="form-label small fw-bold">Select Dynamic Field (by Form Category)</label>
+                    <select class="form-select form-select-sm select2-meta-field" id="meta_field" name="meta_field">
+                        <option value="">-- All Dynamic Fields --</option>
+                        @foreach($forms as $formCategory)
+                            <optgroup label="Form Category: {{ $formCategory->name }}">
+                                @foreach($formCategory->fields as $field)
+                                    <option value="{{ $field->field_name }}" {{ request('meta_field') == $field->field_name ? 'selected' : '' }}>
+                                        {{ $field->label }} [{{ $field->field_name }}]
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="col-12 col-md-5">
-                    <label for="meta_value" class="form-label small fw-bold">Dynamic Meta Value Query</label>
+                    <label for="meta_value" class="form-label small fw-bold">Dynamic Field Value Query</label>
                     <input type="text" class="form-control form-control-sm" id="meta_value" name="meta_value" value="{{ request('meta_value') }}" placeholder="e.g. Apex or Municipal Solid Waste">
                 </div>
 
@@ -165,6 +176,14 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        // Initialize Select2 for Dynamic Meta Field Filter
+        $('.select2-meta-field').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Select Dynamic Field --',
+            allowClear: true,
+            width: '100%'
+        });
+
         // DataTables initialization
         $('#transactions-table').DataTable({
             paging: false,
